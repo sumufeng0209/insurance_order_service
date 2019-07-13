@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.java.dao.OrderMapper">
+
+    <sql id="orderSql">
+        SELECT
+            *,
+            (
+                SELECT
+                    car_number
+                FROM
+                    car
+                WHERE
+                    order_id = customer_order.order_id
+            ) AS `car_number`,
+            (
+                SELECT
+                    SUM(premium)
+                FROM
+                    type_of_insurance_item
+                WHERE
+                    order_id = customer_order.order_id
+            ) as `premium_sum`,
+            (
+                SELECT
+                    SUM(premium)
+                FROM
+                    type_of_insurance_item
+                WHERE
+                    order_id = customer_order.order_id AND
+                    insurance_id = '7402a7fd-9d6b-11e9-8168-00163e04ed9f'
+            ) AS `jiaoQiangXian_premium`,
+            (
+                SELECT
+                    SUM(premium)
+                FROM
+                    type_of_insurance_item
+                WHERE
+                    order_id = customer_order.order_id AND
+                    insurance_id NOT IN('7402a7fd-9d6b-11e9-8168-00163e04ed9f')
+            ) AS `shangYeXian_premium`
+        FROM
+            customer_order
+    </sql>
+
+    <!--根据投保订单编号查询相关险种项信息-->
+    <select id="findInsuranceItemsByOrderId" resultType="map">
+        SELECT
+            *
+        FROM
+            type_of_insurance_item item,type_of_insurance insurance
+        WHERE
+            item.insurance_id = insurance.insurance_id and
+            item.order_id = #{order_id}
+    </select>
+
+    <!--根据订单编号查询对应的汽车信息-->
+    <select id="findCarByOrderId" resultType="map">
+        select * from car where order_id = #{order_id}
+    </select>
+
+    <!--手动封装投保订单返回类型-->
+    <resultMap id="orderMap" type="map">
+        <id property="order_id" column="order_id"/>
+        <result property="is_pay_jiaoQiangXian" column="is_pay_jiaoQiangXian"/>
+        <result property="jiaoQiangXian_start_date" column="jiaoQiangXian_start_date"/>
+        <result property="is_cheChuanShui" column="is_cheChuanShui"/>
+        <result property="is_pay_shangYeXian" column="is_pay_shangYeXian"/>
+        <result property="shangYeXian_start_date" column="shangYeXian_start_date"/>
+        <result property="touBaoChengShi" column="touBaoChengShi"/>
+        <result property="car_truename" column="car_truename"/>
+        <result property="phone" column="phone"/>
+        <result property="identity" column="identity"/>
+        <result property="status" column="status"/>
+        <result property="cust_id" column="cust_id"/>
+        <result property="inquiry_time" column="inquiry_time"/>
+        <result property="pay_time" column="pay_time"/>
+        <result property="close_time" column="close_time"/>
+        <result property="instance_id" column="instance_id"/>
+        <!--关联属性汽车-->
+        <association property="car" column="order_id" javaType="map" select="findCarByOrderId">
+            <id property="car_id" column="car_id"/>
+            <result property="car_number" column="car_number"/>
+            <result property="car_vin" column="car_vin"/>
+            <result property="car_engine_number" column="car_engine_number"/>
+            <result property="manufacturer" column="manufacturer"/>
+            <result property="guiding_price" column="guiding_price"/>
+            <result property="sale_name" column="sale_name"/>
+            <result property="car_color" column="car_color"/>
+            <result property="car_purchase_date" column="car_purchase_date"/>
+            <result property="car_use_nature" column="car_use_nature"/>
+            <result property="car_first_register_date" column="car_first_register_date"/>
+            <result property="car_status" column="car_status"/>
+            <result property="car_type" column="car_type"/>
+            <result property="car_driving_license_type" column="car_driving_license_type"/>
+            <result property="seat_num" column="seat_num"/>
+            <result property="car_weight" column="car_weight"/>
+            <result property="car_carry_passenger_weight" column="car_carry_passenger_weight"/>
+            <result property="car_place_of_origin" column="car_place_of_origin"/>
+            <result property="car_cust_id" column="car_cust_id"/>
+            <result property="fuel_Type" column="fuel_Type"/>
+            <result property="brand_name" column="brand_name"/>
+            <result property="order_id" column="order_id"/>
+        </association>
+        <!--关联属性险种项-->
+        <collection property="insuranceItems" column="order_id" select="findInsuranceItemsByOrderId">
+            <id column="item_id"/>
+            <result property="insurance_id" column="insurance_id"/>
+            <result property="insurance_name" column="insurance_name"/>
+            <result property="premium" column="premium"/>
+            <result property="insured_amount" column="insured_amount"/>
+            <result property="order_id" column="order_id"/>
+            <result property="policy_id" column="policy_id"/>
+            <result property="is_no_deductible" column="is_no_deductible"/>
+        </collection>
+    </resultMap>
+
+
+    <!---通过投保订单编号查询投保订单信息-->
+    <select id="findOrderByInstanceId" resultMap="orderMap">
+        <include refid="orderSql"></include>
+        where instance_id = #{instance_id}
+    </select>
+
+
+
+    <!--根据订单编号修改订单状态-->
+    <update id="updateOrderStatusByOrderId">
+        update customer_order set status = #{status} where order_id = #{order_id}
+    </update>
+
+</mapper>
