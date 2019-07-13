@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link th:href="@{/gateway/order/bootstrap-3.3.7-dist/css/bootstrap.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/gateway/order/css/common.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/gateway/order/css/style.css}" rel="stylesheet" type="text/css"/>
+    <Link th:href="@{/gateway/order/css/font-awesome.min.css}" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" th:href="@{/gateway/order/layui/css/layui.css}"  media="all">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script th:src="@{/gateway/order/js/jquery.SuperSlide.2.1.1.js}" type="text/javascript"></script>
+    <script th:src="@{/gateway/order/js/common_js.js}" type="text/javascript"></script>
+    <script th:src="@{/gateway/order/js/footer.js}" type="text/javascript"></script>
+    <script th:src="@{/gateway/order/js/cityselect.js}" type="text/javascript"></script>
+    <script th:src="@{/gateway/order/js/layer/layer.js}" type="text/javascript"></script>
+    <script th:src="@{/gateway/order/js/laydate/laydate.js}" type="text/javascript"></script>
+    <script th:src="@{/gateway/order/bootstrap-3.3.7-dist/js/bootstrap.js}" type="text/javascript"></script>
+    <title>审核保单页面</title>
+    <style>
+        #carInfo li, #test li, #cheZhuInfo li {
+            width: 33%;
+            display: inline-block;
+        }
+
+        #carInfo span, #test span, #cheZhuInfo span {
+            width: 60%;
+        }
+
+    </style>
+</head>
+
+<body>
+<!--保单详情-->
+<div class=" pages_style">
+    <div class="page ">
+        <div class="Query_results_style user_Policy_info">
+            <div class="Query_results margin">
+                <form id="info" th:action="@{|/completeCarInfo|}" method="post">
+                    <input type="hidden" name="task_id" th:value="${order.task_id}"/>
+                    <input type="hidden" name="forward_type" value="0"/>
+                    <input type="hidden" name="car_id" th:value="${order.car.car_id}"/>
+                    <input type="hidden" name="order_id" th:value="${order.order_id}"/>
+                    <div class="prompt clearfix"><b>苏车保保单信息</b></div>
+                    <div class="clearfix">
+                        <div class="order_number">订单号：[[${order.order_id}]]</div>
+                        <ul class="Query_results_content clearfix" id="test">
+                            <li><label class="label_name">投保城市：</label><span class="jt_content"><input type="text"
+                                                                                                       name="touBaoChengShi"
+                                                                                                       class="form-control"
+                                                                                                       th:value="${order.touBaoChengShi}"/></span>
+                            </li>
+                            <li><label class="label_name">保险公司：</label><span class="jt_content"><input type="text"
+                                                                                                       class="form-control"
+                                                                                                       th:value="苏车保车险"/></span>
+                            </li>
+                            <li><label class="label_name">车牌号：</label><span class="jt_content"><input type="text"
+                                                                                                      name="car_number"
+                                                                                                      class="form-control"
+                                                                                                      th:value="${order.car.car_number}"/></span>
+                            </li>
+                        </ul>
+                        <div class="Query_results_title">车主信息</div>
+                        <ul class="Query_results_content clearfix" id="cheZhuInfo">
+                            <li class="width20"><label class="label_name">车主姓名：</label><span class="jt_content"><input
+                                    type="text" name="car_truename" class="form-control"
+                                    th:value="${order.touBaoChengShi}"/></span></li>
+                            <li><label class="label_name">手机号：</label><span class="jt_content"><input type="text"
+                                                                                                      name="phone"
+                                                                                                      class="form-control"
+                                                                                                      th:value="${order.phone}"/></span>
+                            </li>
+                            <li><label class="label_name">身份证：</label><span class="jt_content"><input type="text"
+                                                                                                      name="identity"
+                                                                                                      class="form-control"
+                                                                                                      th:value="${order.identity}"/></span>
+                            </li>
+                            <li><label class="label_name">邮箱：</label><span class="jt_content"><input type="text"
+                                                                                                     name="email"
+                                                                                                     class="form-control"
+                                                                                                     th:value="${order.email}"/></span>
+                            </li>
+                        </ul>
+                        <div class="Query_results_title">车辆信息</div>
+                        <ul class="Query_results_content clearfix" id="carInfo">
+                            <!--<li class="width100"><label class="label_name">品牌型号：</label><span class="jt_content">广汽传祺 传祺GS4 2017款 235T</span></li>-->
+                            <!--<li><label class="label_name">投保城市：</label><span class="jt_content">江苏省南京市</span></li>-->
+                            <!--<li><label class="label_name">保险公司：</label><span class="jt_content">太平洋保险</span></li>-->
+                            <!--<li><label class="label_name">车牌号：</label><span class="jt_content">苏A 12531</span></li>-->
+                            <!--<li><label class="label_name">车辆所属：</label><span class="jt_content">个人</span></li>-->
+                            <!--<li><label class="label_name">注册登记：</label><span class="jt_content">2014-3-4</span></li>-->
+                            <!--<li><label class="label_name">车辆识别码：</label><span class="jt_content">	GFDD34334DF345</span></li>-->
+                            <!--<li><label class="label_name">发动机号：</label><span class="jt_content">123445434543</span></li>-->
+                            <!--<li><label class="label_name">车辆类型：</label><span class="jt_content">轿车</span></li>-->
+                            <!--<li><label class="label_name">燃油类型：</label><span class="jt_content">汽油</span></li>-->
+                            <!--<li><label class="label_name">车船税：</label><span class="jt_content">正常缴纳</span></li>-->
+                            <!--<li><label class="label_name">是否过户：</label><span class="jt_content">否</span></li>-->
+                            <li class="width100"><label class="label_name">车牌号：</label><span class="jt_content"><input
+                                    type="text" name="car_number" class="form-control"
+                                    th:value="${order.car.car_number}"/></span></li>
+                            <li class="width100"><label class="label_name">车架号：</label><span class="jt_content"><input
+                                    type="text" name="car_vin" class="form-control"
+                                    th:value="${order.car.car_vin}"/></span></li>
+                            <li class="width100"><label class="label_name">品牌名称：</label><span class="jt_content"><input
+                                    type="text" name="brand_name" class="form-control"
+                                    th:value="${order.car.brand_name}"/></span></li>
+                            <li class="width100"><label class="label_name">车辆类型：</label><span class="jt_content"><input
+                                    type="text" name="car_type" class="form-control" th:value="${order.car.car_type}"/></span>
+                            </li>
+                            <li class="width100"><label class="label_name">燃油类型：</label><span class="jt_content"><input
+                                    type="text" name="fuel_Type" class="form-control"
+                                    th:value="${order.car.fuel_Type}"/></span></li>
+                            <li class="width100"><label class="label_name">新车价格：</label><span class="jt_content"><input
+                                    type="text" name="guiding_price" class="form-control"
+                                    th:value="${order.car.guiding_price}"/></span></li>
+                            <li class="width100"><label class="label_name">制造商：</label><span class="jt_content"><input
+                                    type="text" name="manufacturer" class="form-control"
+                                    th:value="${order.car.manufacturer}"/></span></li>
+                            <li class="width100"><label class="label_name">排量型号：</label><span class="jt_content"><input
+                                    type="text" name="sale_name" class="form-control"
+                                    th:value="${order.car.sale_name}"/></span></li>
+                            <li class="width100"><label class="label_name">载客人数：</label><span class="jt_content"><input
+                                    type="text" name="seat_num" class="form-control" th:value="${order.car.seat_num}"/></span>
+                            </li>
+                            <li class="width100"><label class="label_name">注册日期：</label><span class="jt_content"><input
+                                    type="text" name="car_first_register_date" class="form-control"
+                                    th:value="${order.car.car_first_register_date}"/></span></li>
+                            <li class="width100"><label class="label_name">发动机号：</label><span class="jt_content"><input
+                                    type="text" name="car_engine_number" class="form-control"
+                                    th:value="${order.car.car_engine_number}"/></span></li>
+                            <li class="width100"><label class="label_name">车身颜色：</label><span class="jt_content"><input
+                                    type="text" name="car_color" class="form-control"
+                                    th:value="${order.car.car_color}"/></span></li>
+                            <li class="width100"><label class="label_name">购买日期：</label><span class="jt_content"><input
+                                    type="text" name="car_purchase_date" class="form-control"
+                                    th:value="${order.car.car_purchase_date}"/></span></li>
+                            <li class="width100"><label class="label_name">使用性质：</label><span class="jt_content"><input
+                                    type="text" name="car_use_nature" class="form-control"
+                                    th:value="${order.car.car_use_nature}"/></span></li>
+                            <li class="width100"><label class="label_name">行驶证类型：</label><span class="jt_content"><input
+                                    type="text" name="car_driving_license_type" class="form-control"
+                                    th:value="${order.car.car_driving_license_type}"/></span></li>
+                            <li class="width100"><label class="label_name">载客质量：</label><span class="jt_content"><input
+                                    type="text" name="car_carry_passenger_weight" class="form-control"
+                                    th:value="${order.car.car_carry_passenger_weight}"/></span></li>
+                            <li class="width100"><label class="label_name">车辆产地：</label><span class="jt_content"><input
+                                    type="text" name="car_place_of_origin" class="form-control"
+                                    th:value="${order.car.car_place_of_origin}"/></span></li>
+                        </ul>
+                        <div class="Query_results_title">投保信息（报价详细）</div>
+                        <ul class="Insured_inquiry_info clearfix">
+                            <li><label class="label_name">交强险：</label>
+                                <div class="jt_content">[[${order.is_pay_jiaoQiangXian=='1'?'投保':'不投保'}]] <span
+                                        class="time">生效时间：[[${order.jiaoQiangXian_start_date}]]</span>
+                                    <span class="cost"
+                                          th:if="${order.jiaoQiangXian_premium==0 or order.jiaoQiangXian_premium==null}">保费：等待报价</span>
+                                    <span class="cost"
+                                          th:if="${order.jiaoQiangXian_premium!=0 and order.jiaoQiangXian_premium!=null}">￥[[${order.jiaoQiangXian_premium}]]</span>
+                                </div>
+                            </li>
+                            <li><label class="label_name">车船税：</label>
+                                <div class="jt_content">[[${order.is_cheChuanShui=='1'?'正常缴纳':'不缴纳'}]]</div>
+                            </li>
+                            <li class="comm_insurance">
+                                <div class="clearfix"><label class="label_name">商业险：</label>
+                                    <div class="jt_content">[[${order.is_pay_shangYeXian=='1'?'投保':'不投保'}]] <span
+                                            class="time">生效时间：[[${order.shangYeXian_start_date}]]</span>
+                                        <span class="cost"
+                                              th:if="${order.shangYeXian_premium==0 or order.shangYeXian_premium==null}">保费：等待报价</span>
+                                        <span class="cost"
+                                              th:if="${order.shangYeXian_premium!=0 or order.shangYeXian_premium!=null}">￥[[${order.shangYeXian_premium}]]</span>
+                                    </div>
+                                </div>
+                                <table cellpadding="0" cellspacing="0" class="insurance_style" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th width="180px">保险名称</th>
+                                        <th>投保金额</th>
+                                        <th width="100px">保险费用</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="item:${order.insuranceItems}">
+                                        <td>[[${item.insurance_name}]]</td>
+                                        <td th:if="${item.insured_amount==0 || item.insured_amount==null}"
+                                            style="color: red">足额投保
+                                        </td>
+                                        <td th:if="${item.insured_amount!=0 && item.insured_amount!=null}"
+                                            style="color: red">[[${item.insured_amount}]]
+                                        </td>
+                                        <td th:if="${item.premium==0 || item.premium==null}" style="color: red">等待报价
+                                        </td>
+                                        <td th:if="${item.premium!=0 && item.premium!=null}" style="color: red">
+                                            [[${item.premium}]]
+                                        </td>
+                                    </tr>
+                                    <!--<tr>-->
+                                    <!--<td>涉水行驶损失险</td>-->
+                                    <!--<td>足额投保</td>-->
+                                    <!--<td>123</td>-->
+                                    <!--</tr>-->
+                                    <!--<tr>-->
+                                    <!--<td>车身划痕损失险</td>-->
+                                    <!--<td>足额投保</td>-->
+                                    <!--<td>431</td>-->
+                                    <!--</tr>-->
+                                    <!--<tr>-->
+                                    <!--<td>车辆损失险</td>-->
+                                    <!--<td>足额投保</td>-->
+                                    <!--<td>232</td>-->
+                                    <!--</tr>-->
+                                    <!--<tr>-->
+                                    <!--<td>车辆损失险</td>-->
+                                    <!--<td>足额投保</td>-->
+                                    <!--<td>111</td>-->
+                                    <!--</tr>-->
+                                    </tbody>
+                                </table>
+                                <div class="clearfix Non-deductible marginsx">
+                                    <label class="label_name">不计免赔：</label>
+                                    <div class="jt_content">
+                                        <span class="name" th:if="${item.is_no_deductible=='1'}"
+                                              th:each="item:${order.insuranceItems}">[[${item.insurance_name}]]</span>
+                                        <!--<span class="name">车身划痕损失险</span>-->
+                                        <!--<span class="name">涉水行驶损失险</span>-->
+                                        <!--<span class="name">涉水行驶损失险</span>-->
+                                        <!--<span class="name">涉水行驶损失险</span>-->
+                                        <!--<span class="name">涉水行驶损失险</span>             -->
+                                    </div>
+                                    <!--<span class="cost">保费：￥[[${order.premium_sum}]]</span>-->
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+                <!--保费统计-->
+                <div class="Premium_statistics" th:if="${order.premium_sum==0 || order.premium_sum==null}">保费总计：<span
+                        style="color: red;">等待报价</span></div>
+                <div class="Premium_statistics" th:if="${order.premium_sum!=0 && order.premium_sum!=null}">保费总计：￥<b>[[${order.premium_sum}]]</b>元/年
+                </div>
+
+
+                <form id="certificatorAuditForm" th:action="@{/completeAuditOrder}" method="post" class="layui-form" style="text-align: center">
+                    <input type="hidden" name="order_id" th:value="${order.order_id}"/>
+                    <input type="hidden" name="task_id" th:value="${order.task_id}"/>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1" style="font-size: 16px;padding: 10px;">审核意见</label>
+                        <textarea class="form-control" rows="3" id="exampleInputEmail1" name=verify_opinion></textarea>
+                    </div>
+                    <input type="radio" name="certificatorAudit" value="1" title="通过" checked/>
+                    <input type="radio" name="certificatorAudit" value="0" title="不通过"/>
+                    <p style="margin-top: 10px;">
+                        <button type="button" class="btn btn-success" th:onclick="submit_info()">确定</button>
+                        <button type="button" class="btn btn-info">返回</button>
+                    </p>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script th:src="@{/gateway/order/layui/layui.js}" charset="utf-8"></script>
+<script type="text/javascript" th:inline="javascript">
+    layui.use(['form'],function(){
+        var form =layui.form;
+        form.render();
+    });
+
+
+    //提交审核表单
+    function submit_info(){
+        $("#submit_certificatorAuditForm").submit();
+    }
+</script>
+
+</body>
+</html>
