@@ -1,0 +1,21 @@
+server:
+  port: 8800
+spring:
+  application:
+    name: order-service
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: thw
+    password: thw19971017thw
+    url: jdbc:mysql://47.52.128.159:3306/insuranceDB
+    tomcat:
+      max-wait: 10000
+      min-idle: 20
+      max-idle: 100
+      max-active: 300
+eureka:
+  client:
+    service-url:
+      default-Zone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
