@@ -59,6 +59,24 @@
         select * from car where order_id = #{order_id}
     </select>
 
+
+
+    <!--根据订单编号查询证件信息-->
+    <select id="findCertificatesByOrderId" resultType="map">
+        select * from customer_certificates where order_id = #{order_id}
+    </select>
+
+    <!--根据投保订单号查询投保人信息-->
+    <select id="findPolicyHolderByOrderId" resultType="map">
+      select * from policy_holder_info where order_id = #{order_id}
+    </select>
+
+
+    <!--根据投保订单号查询被保人信息-->
+    <select id="findInsuredByOrderId" resultType="map">
+        select * from insured_info where order_id = #{order_id}
+    </select>
+
     <!--手动封装投保订单返回类型-->
     <resultMap id="orderMap" type="map">
         <id property="order_id" column="order_id"/>
@@ -77,6 +95,29 @@
         <result property="pay_time" column="pay_time"/>
         <result property="close_time" column="close_time"/>
         <result property="instance_id" column="instance_id"/>
+
+        <!--关联属性投保人-->
+        <association property="policy_holder" column="order_id" javaType="map" select="findPolicyHolderByOrderId">
+            <id property="holder_id" column="holder_id"/>
+            <result property="holder_truename" column="holder_truename"/>
+            <result property="holder_identity" column="holder_identity"/>
+            <result property="holder_phone" column="holder_phone"/>
+            <result property="order_id" column="order_id"/>
+        </association>
+
+        <!--关联属性被保人-->
+        <association property="insured" column="order_id" javaType="map" select="findInsuredByOrderId">
+            <id property="insured_id" column="insured_id"/>
+            <result property="insured_name" column="insured_name"/>
+            <result property="insured_sex" column="insured_sex"/>
+            <result property="insured_identity" column="insured_identity"/>
+            <result property="insured_phone" column="insured_phone"/>
+            <result property="insured_email" column="insured_email"/>
+            <result property="insured_bank_card" column="insured_bank_card"/>
+            <result property="insured_address" column="insured_address"/>
+            <result property="order_id" column="order_id"/>
+        </association>
+
         <!--关联属性汽车-->
         <association property="car" column="order_id" javaType="map" select="findCarByOrderId">
             <id property="car_id" column="car_id"/>
@@ -102,6 +143,20 @@
             <result property="brand_name" column="brand_name"/>
             <result property="order_id" column="order_id"/>
         </association>
+
+        <!--关联属性证件-->
+        <association property="certificates" column="order_id" javaType="map" select="findCertificatesByOrderId">
+            <id property="certificates_id" column="certificates_id"/>
+            <result property="identity_positive" column="identity_positive"/>
+            <result property="identity_back" column="identity_back"/>
+            <result property="driver_license" column="driver_license"/>
+            <result property="driver_back" column="driver_back"/>
+            <result property="order_id" column="order_id"/>
+            <result property="policy_id" column="policy_id"/>
+            <result property="front_of_driving_license" column="front_of_driving_license"/>
+            <result property="front_of_driving_back" column="front_of_driving_back"/>
+        </association>
+
         <!--关联属性险种项-->
         <collection property="insuranceItems" column="order_id" select="findInsuranceItemsByOrderId">
             <id column="item_id"/>
@@ -116,7 +171,7 @@
     </resultMap>
 
 
-    <!---通过投保订单编号查询投保订单信息-->
+    <!---通过投保订单流程实例查询投保订单信息-->
     <select id="findOrderByInstanceId" resultMap="orderMap">
         <include refid="orderSql"></include>
         where instance_id = #{instance_id}
@@ -128,5 +183,20 @@
     <update id="updateOrderStatusByOrderId">
         update customer_order set status = #{status} where order_id = #{order_id}
     </update>
+
+
+
+    <!--通过订单编号查询订单退款申请信息-->
+    <select id="findRefundApplyByOrderId" resultType="map">
+        select * from refund_apply where order_id = #{order_id}
+    </select>
+
+
+    <!--通过订单编号查询订单信息-->
+    <select id="findOrderByOrderId" resultMap="orderMap">
+        <include refid="orderSql"></include>
+        where order_id = #{order_id}
+    </select>
+
 
 </mapper>

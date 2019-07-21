@@ -215,26 +215,6 @@
                                             [[${item.premium}]]
                                         </td>
                                     </tr>
-                                    <!--<tr>-->
-                                    <!--<td>涉水行驶损失险</td>-->
-                                    <!--<td>足额投保</td>-->
-                                    <!--<td>123</td>-->
-                                    <!--</tr>-->
-                                    <!--<tr>-->
-                                    <!--<td>车身划痕损失险</td>-->
-                                    <!--<td>足额投保</td>-->
-                                    <!--<td>431</td>-->
-                                    <!--</tr>-->
-                                    <!--<tr>-->
-                                    <!--<td>车辆损失险</td>-->
-                                    <!--<td>足额投保</td>-->
-                                    <!--<td>232</td>-->
-                                    <!--</tr>-->
-                                    <!--<tr>-->
-                                    <!--<td>车辆损失险</td>-->
-                                    <!--<td>足额投保</td>-->
-                                    <!--<td>111</td>-->
-                                    <!--</tr>-->
                                     </tbody>
                                 </table>
                                 <div class="clearfix Non-deductible marginsx">
@@ -242,13 +222,7 @@
                                     <div class="jt_content">
                                         <span class="name" th:if="${item.is_no_deductible=='1'}"
                                               th:each="item:${order.insuranceItems}">[[${item.insurance_name}]]</span>
-                                        <!--<span class="name">车身划痕损失险</span>-->
-                                        <!--<span class="name">涉水行驶损失险</span>-->
-                                        <!--<span class="name">涉水行驶损失险</span>-->
-                                        <!--<span class="name">涉水行驶损失险</span>-->
-                                        <!--<span class="name">涉水行驶损失险</span>             -->
                                     </div>
-                                    <!--<span class="cost">保费：￥[[${order.premium_sum}]]</span>-->
                                 </div>
                             </li>
                         </ul>
@@ -275,30 +249,28 @@
                     <img th:src="@{|/gateway/order/showImg/front_of_driving_back|}"/>
                 </div>
 
-
-                <form th:if="${task_type=='auditOrders'}" id="certificatorAuditForm" th:action="@{/gateway/order/completeAuditOrder}" method="post" class="layui-form" style="text-align: center">
+                <form id="refundOrderAuditForm" th:action="@{/gateway/order/completeRefundApplyAudit}" method="post" class="layui-form" style="text-align: center">
                     <input type="hidden" name="order_id" th:value="${order.order_id}"/>
                     <input type="hidden" name="task_id" th:value="${order.task_id}"/>
+                    <input type="hidden" name="refund_amount" th:value="${order.premium_sum-50}"/>
                     <div class="form-group">
-                        <label for="exampleInputEmail1" style="font-size: 16px;padding: 10px;">审核意见</label>
-                        <textarea class="form-control" rows="3" id="exampleInputEmail1" name=verify_opinion></textarea>
+                        <p style="text-align: left">
+                            <label for="exampleInputEmail1" style="font-size: 16px;padding: 10px;">退款申请时间：</label>
+                            <label style="font-size: 20px;color:red;">[[${refundApply.refund_time}]]</label>
+                            <label for="exampleInputEmail1" style="font-size: 16px;padding: 10px;">实际退款金额：</label>
+                            <label style="font-size: 20px;color:red;">￥[[${order.premium_sum-50}]]</label>
+                        </p>
+                        <label for="exampleInputEmail1" style="font-size: 16px;padding: 10px;">退款申请信息</label>
+                        <textarea class="form-control" rows="3" id="exampleInputEmail1" name=verify_opinion>[[${refundApply.refund}]]</textarea>
                     </div>
                     <input type="radio" name="certificatorAudit" value="1" title="通过" checked/>
-                    <input type="radio" name="certificatorAudit" value="0" title="不通过"/>
+                    <input type="radio" name="certificatorAudit" value="0" disabled title="不通过"/>
                     <p style="margin-top: 10px;">
-                        <button type="button" class="btn btn-success" th:onclick="submit_info()">确定</button>
+                        <button type="button" class="btn btn-success" onclick="submit_info()">确定</button>
                         <button type="button" class="btn btn-info">返回</button>
                     </p>
                 </form>
 
-                <form th:if="${task_type=='confirm'}" id="confirmForm" th:action="@{|/gateway/order/confirmSign|}" method="post">
-                    <input type="hidden" name="order_id" th:value="${order.order_id}"/>
-                    <input type="hidden" name="task_id" th:value="${order.task_id}"/>
-                    <div style="text-align: center">
-                        <button type="button" class="btn btn-primary btn-lg" onclick="submit_confirmForm()">确认签字</button>
-                        <button type="button" class="btn btn-primary btn-lg">返回</button>
-                    </div>
-                </form>
             </div>
 
         </div>
@@ -311,16 +283,19 @@
         form.render();
     });
 
-
-    //提交审核表单
     function submit_info(){
-        $("#certificatorAuditForm").submit();
+        var url = [[@{/gateway/order/completeRefundApplyAudit}]];
+        $.ajax({
+            url:url,
+            type:'post',
+            dataType:'json',
+            data:$("#refundOrderAuditForm").serialize(),
+            success:function(result){
+                alert(result);
+            }
+        });
     }
 
-    //提交确认签字表单
-    function submit_confirmForm() {
-        $("#confirmForm").submit();
-    }
 </script>
 
 </body>

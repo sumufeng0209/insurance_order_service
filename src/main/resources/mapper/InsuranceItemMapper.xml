@@ -12,4 +12,12 @@
         where
             item_id = #{item_id}
     </update>
+
+
+
+    <!--通过保单编号查询该保单所购买的险种项信息-->
+    <select id="findInsuranceItemByPolicyId" resultType="map">
+        select * from type_of_insurance_item
+        where policy_id = #{policy_id}
+    </select>
 </mapper>

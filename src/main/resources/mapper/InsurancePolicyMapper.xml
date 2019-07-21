@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.java.dao.InsurancePolicyMapper">
+
+
+    <!--向保单表中插入一条数据-->
+    <insert id="insertInsurancePolicy" parameterType="map">
+        insert into customer_insurance_policy values(
+            #{policy_id},
+            #{policy_number},
+            #{car_id},
+            #{insured_id},
+            #{policy_holder_id},
+            #{policy_type},
+            #{start_time},
+            #{stop_time},
+            #{order_id},
+            #{policy_ducoment}
+        )
+    </insert>
+
+
+    <!--根据保单编号修改电子保单文件-->
+    <update id="updateInsurancePolicyDocument">
+        update
+            customer_insurance_policy
+        set
+            policy_document = #{policy_document,jdbcType=BINARY}
+        where
+            policy_id = #{policy_id}
+    </update>
+
+
+
+    <!--多条件分页查询保单信息-->
+    <select id="findInsurancePolicyByCondition" resultType="map" parameterType="map">
+        select 
+            * 
+        from 
+            customer_insurance_policy 
+        <where>
+            <if test="policy_number!=null and policy_number!=''">
+                policy_number = #{policy_number}
+            </if>
+            <if test="insured_name!=null and insured_name!=''">
+                insured_id in(
+                    select
+                        insured_id
+                    from
+                        insured_info
+                    where
+                        insured_name = #{insured_name}
+                )
+            </if>
+            <if test="car_number!=null and car_number!=''">
+                car_id in(
+                    select
+                        *
+                    from
+                        car
+                    where
+                        car_number = #{car_number}
+                )
+            </if>
+        </where>
+        limit #{pageIndex},#{pageSize}
+    </select>
+
+
+    <!--多条件查询保单数量-->
+    <select id="findInsurancePolicyCountByCondition" resultType="int" parameterType="map">
+        select
+            count(*)
+        from
+            customer_insurance_policy
+        <where>
+            <if test="policy_number!=null and policy_number!=''">
+                policy_number = #{policy_number}
+            </if>
+            <if test="insured_name!=null and insured_name!=''">
+                insured_id in(
+                select
+                insured_id
+                from
+                insured_info
+                where
+                insured_name = #{insured_name}
+                )
+            </if>
+            <if test="car_number!=null and car_number!=''">
+                car_id in(
+                select
+                    *
+                from
+                    car
+                where
+                    car_number = #{car_number}
+                )
+            </if>
+        </where>
+    </select>
+</mapper>
