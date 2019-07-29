@@ -267,7 +267,7 @@
                     <input type="radio" name="certificatorAudit" value="0" disabled title="不通过"/>
                     <p style="margin-top: 10px;">
                         <button type="button" class="btn btn-success" onclick="submit_info()">确定</button>
-                        <button type="button" class="btn btn-info">返回</button>
+                        <button type="button" class="btn btn-info" onclick="history.back()">返回</button>
                     </p>
                 </form>
 
@@ -285,13 +285,33 @@
 
     function submit_info(){
         var url = [[@{/gateway/order/completeRefundApplyAudit}]];
+        var index = layer.msg('提交中，请稍后......');
         $.ajax({
             url:url,
             type:'post',
             dataType:'json',
             data:$("#refundOrderAuditForm").serialize(),
             success:function(result){
-                alert(result);
+                layer.close(index);
+                if(result){
+                    layer.open({
+                        type:0,
+                        content:'退款成功',
+                        icon:'success',
+                        end:function(){
+                            history.back();
+                        }
+                    });
+                }else{
+                    layer.open({
+                        type:0,
+                        content:'退款失败',
+                        icon:'err',
+                        end:function(){
+                            history.back();
+                        }
+                    });
+                }
             }
         });
     }

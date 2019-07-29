@@ -287,7 +287,7 @@
                     <input type="radio" name="certificatorAudit" value="0" title="不通过"/>
                     <p style="margin-top: 10px;">
                         <button type="button" class="btn btn-success" th:onclick="submit_info()">确定</button>
-                        <button type="button" class="btn btn-info">返回</button>
+                        <button type="button" class="btn btn-info" onclick="history.back()">返回</button>
                     </p>
                 </form>
 
@@ -296,7 +296,7 @@
                     <input type="hidden" name="task_id" th:value="${order.task_id}"/>
                     <div style="text-align: center">
                         <button type="button" class="btn btn-primary btn-lg" onclick="submit_confirmForm()">确认签字</button>
-                        <button type="button" class="btn btn-primary btn-lg">返回</button>
+                        <button type="button" class="btn btn-primary btn-lg" onclick="history.back()">返回</button>
                     </div>
                 </form>
             </div>
@@ -314,11 +314,13 @@
 
     //提交审核表单
     function submit_info(){
+        layer.msg('提交中，请稍后......');
         $("#certificatorAuditForm").submit();
     }
 
     //提交确认签字表单
     function submit_confirmForm() {
+        layer.msg('提交中，请稍后......');
         $("#confirmForm").submit();
     }
 </script>

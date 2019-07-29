@@ -92,7 +92,7 @@ public class OrderController {
     @RequestMapping("completeQuotationDetailsTask")
     public String completeQuotationDetailsTask(String task_id,String[] item_id,double[] insured_amount,double[] premium,String order_id){
         orderService.completeQuotationDetailsTask(order_id,task_id,item_id,insured_amount,premium);
-        return "";
+        return "redirect:http://localhost:9000/gateway/order/forwardManualQuotationList";
     }
 
 
@@ -104,15 +104,15 @@ public class OrderController {
     @RequestMapping("completeAuditOrder")
     public String completeAuditOrder(@RequestParam Map<String,Object> map){
 
-        Map<String,Object> employee = (Map<String, Object>) ses.getAttribute("employee");
+        Map<String,Object> emp = (Map<String, Object>) ses.getAttribute("emp");
 
-//        String emp_id = employee.get("emp_id").toString();
-//
-//        map.put("emp_id",emp_id);
+        String emp_id = emp.get("emp_id").toString();
+
+        map.put("emp_id",emp_id);
 
         orderService.completeAuditOrders(map);
 
-        return "";
+        return "redirect:http://localhost:9000/gateway/order/forwardPolicyAuditList";
     }
 
 
@@ -152,6 +152,7 @@ public class OrderController {
      * @param map
      * @return
      */
+    @HystrixCommand(fallbackMethod = "confirmSignFallback")
     @RequestMapping("confirmSign")
     public String confirmSign(@RequestParam Map<String,Object> map) throws FileNotFoundException {
         //获得document的路径
@@ -159,7 +160,17 @@ public class OrderController {
         serverpath=serverpath.substring(1);//从路径字符串中取出工程路径
         map.put("docuemntPath",serverpath+"\\document");
         orderService.completeConfirmSign(map);
-        return "";
+        return "redirect:http://localhost:9000/gateway/order/forwardConfirmSignList";
+    }
+
+
+    /**
+     * 确认签字兜底方法
+     * @param map
+     * @return
+     */
+    public String confirmSignFallback(@RequestParam Map<String,Object> map){
+        return "redirect:http://localhost:9000/gateway/order/forwardConfirmSignList";
     }
 
 
@@ -181,7 +192,11 @@ public class OrderController {
     }
 
 
-
+    /**
+     * 完成退款任务
+     * @param map
+     * @return
+     */
     @HystrixCommand(fallbackMethod = "completeRefundApplyAuditFallback")
     @RequestMapping("completeRefundApplyAudit")
     @ResponseBody
@@ -194,6 +209,12 @@ public class OrderController {
         return result;
     }
 
+
+    /**
+     * 退款任务兜底方法
+     * @param map
+     * @return
+     */
     public boolean completeRefundApplyAuditFallback(@RequestParam Map<String,Object> map){
         return false;
     }
@@ -232,8 +253,7 @@ public class OrderController {
     @ResponseBody
     public Map<String,Object> findManualQuotationTask(HttpSession session,int pageIndex,int pageSize){
         Map<String,Object> emp = (Map<String, Object>) session.getAttribute("emp");
-        String  emp_id = emp.get("emp_id").toString();
-        Map<String, Object> tasks = orderService.findManualQuotationTask(emp_id, pageIndex, pageSize);
+        Map<String, Object> tasks = orderService.findManualQuotationTask(emp.get("emp_username").toString(), pageIndex, pageSize);
         return tasks;
     }
 
@@ -248,8 +268,8 @@ public class OrderController {
     @ResponseBody
     public Map<String,Object> findPolicyAuditTask(HttpSession session,int pageIndex,int pageSize){
         Map<String,Object> emp = (Map<String, Object>) session.getAttribute("emp");
-        String  emp_id = emp.get("emp_id").toString();
-        Map<String, Object> tasks = orderService.findPolicyAuditTask(emp_id, pageIndex, pageSize);
+        String  emp_username = emp.get("emp_username").toString();
+        Map<String, Object> tasks = orderService.findPolicyAuditTask(emp_username, pageIndex, pageSize);
         return tasks;
     }
 
@@ -264,8 +284,8 @@ public class OrderController {
     @ResponseBody
     public Map<String,Object> findConfirmSignTask(HttpSession session,int pageIndex,int pageSize){
         Map<String,Object> emp = (Map<String, Object>) session.getAttribute("emp");
-        String  emp_id = emp.get("emp_id").toString();
-        Map<String, Object> tasks = orderService.findConfirmSignTask(emp_id, pageIndex, pageSize);
+        String  emp_username = emp.get("emp_username").toString();
+        Map<String, Object> tasks = orderService.findConfirmSignTask(emp_username, pageIndex, pageSize);
         return tasks;
     }
 
@@ -281,8 +301,8 @@ public class OrderController {
     @ResponseBody
     public Map<String,Object> findRefundHandleTask(HttpSession session,int pageIndex,int pageSize){
         Map<String,Object> emp = (Map<String, Object>) session.getAttribute("emp");
-        String  emp_id = emp.get("emp_id").toString();
-        Map<String, Object> tasks = orderService.findRefundHandleTask(emp_id, pageIndex, pageSize);
+        String  emp_username = emp.get("emp_username").toString();
+        Map<String, Object> tasks = orderService.findRefundHandleTask(emp_username, pageIndex, pageSize);
         return tasks;
     }
 
@@ -295,6 +315,7 @@ public class OrderController {
      */
     @RequestMapping("forwardPolicyAuditList")
     public String forwardPolicyAuditList(){
+
         return "policyAuditList";
     }
 

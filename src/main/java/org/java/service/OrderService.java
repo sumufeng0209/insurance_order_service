@@ -39,6 +39,14 @@ public interface OrderService {
 
 
     /**
+     * 完成核保任务，返回流程实例编号，不等于null就代表通过,
+     * @param map
+     * @return
+     */
+    public String completeAuditOrdersReturn(Map<String,Object> map);
+
+
+    /**
      * 完成主管签字任务
      * @param map
      */

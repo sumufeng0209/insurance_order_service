@@ -3,18 +3,18 @@ package org.java.service.impl;
 import com.eaio.uuid.UUID;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.*;
-import com.netflix.discovery.converters.Auto;
-import com.sun.javafx.collections.MappingChange;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.apache.commons.io.FileUtils;
+import org.bouncycastle.util.Times;
 import org.java.dao.InsuranceItemMapper;
 import org.java.dao.InsurancePolicyMapper;
 import org.java.dao.OrderMapper;
 import org.java.dao.OrderVerifyMapper;
 import org.java.service.OrderService;
+import org.java.service.client.ScheduleServiceClient;
 import org.java.util.PolicyNumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,6 +74,10 @@ public class OrderServiceImpl implements OrderService {
     private TaskService taskService;
 
 
+    @Autowired
+    private ScheduleServiceClient scheduleServiceeClient;
+
+
     @Override
     public Map<String, Object> findTaskAndOrderByTaskId(String task_id) {
         //创建任务查询接口
@@ -114,19 +118,25 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-    @Transactional
     @Override
     public void completeAuditOrders(Map<String, Object> map) {
+        String instance_id = completeAuditOrdersReturn(map);
+
+        if(instance_id!=null && !instance_id.equals("")){
+            //代表核保通过
+            //自动分配主管签字任务
+            scheduleServiceeClient.taskAutoDispatch(instance_id);
+        }
+    }
+
+    @Transactional
+    @Override
+    public String completeAuditOrdersReturn(Map<String, Object> map) {
+
         //获取审核结果：1代表通过，0代表不通过
         String certificatorAudit = map.get("certificatorAudit").toString();
 
-        if(certificatorAudit.equals("1")){
-            //通过修改订单状态为交易成功：6
-            orderMapper.updateOrderStatusByOrderId(map.get("order_id").toString(),6);
-        }else{
-            //不通过修改订单状态为审核未通过，重新完善资料：5
-            orderMapper.updateOrderStatusByOrderId(map.get("order_id").toString(),5);
-        }
+
 
         //设置审核编号
         map.put("verify_id",new UUID().toString());
@@ -140,7 +150,26 @@ public class OrderServiceImpl implements OrderService {
         //完成任务，并设置流程变量
         Map<String,Object> variables = new HashMap<>();
         variables.put("certificatorAudit",certificatorAudit);
+
+        //获得流程实例
+        Task task = taskService.createTaskQuery().taskId(map.get("task_id").toString()).singleResult();
+        System.out.println("前任务："+task.getName());
+        //获得流程实例
+        String instance_id = task.getProcessInstanceId();
+        //完成任务
         taskService.complete(map.get("task_id").toString(),variables);
+
+        if(certificatorAudit.equals("1")){
+            //通过修改订单状态为交易成功：6
+            orderMapper.updateOrderStatusByOrderId(map.get("order_id").toString(),6);
+
+            return instance_id;
+        }else{
+            //不通过修改订单状态为审核未通过，重新完善资料：5
+            orderMapper.updateOrderStatusByOrderId(map.get("order_id").toString(),5);
+
+            return null;
+        }
     }
 
 
@@ -189,7 +218,7 @@ public class OrderServiceImpl implements OrderService {
             map.put("start_time",order.get("jiaoQiangXian_start_date"));
 
             //设置保单到期时间为一年后
-            Timestamp time = (Timestamp) order.get("jiaoQiangXian_start_date");
+            Timestamp time = (Timestamp) ((Timestamp) order.get("jiaoQiangXian_start_date")).clone();
             time.setYear(time.getYear()+1);
             map.put("stop_time",time);
 
@@ -214,7 +243,7 @@ public class OrderServiceImpl implements OrderService {
             map.put("start_time",order.get("shangYeXian_start_date"));
 
             //设置保单到期时间为一年后
-            Timestamp time = (Timestamp) order.get("shangYeXian_start_date");
+            Timestamp time = (Timestamp) ((Timestamp) order.get("jiaoQiangXian_start_date")).clone();
             time.setYear(time.getYear()+1);
             map.put("stop_time",time);
 
@@ -473,14 +502,16 @@ public class OrderServiceImpl implements OrderService {
         for (Task task:tasks) {
             Map<String,Object> m = new HashMap<>();
             m.put("task_id",task.getId());
-            m.put("task_name","人工报价");
+            m.put("task_name","保单询价");
             //通过任务编号查询业务数据
             Map<String, Object> order = findTaskAndOrderByTaskId(task.getId());
             m.put("order",order);
+            list.add(m);
         }
         map.put("count",query.list().size());
         map.put("code",0);
         map.put("msg","");
+        map.put("data",list);
         return map;
     }
 
@@ -499,10 +530,12 @@ public class OrderServiceImpl implements OrderService {
             //通过任务编号查询业务数据
             Map<String, Object> order = findTaskAndOrderByTaskId(task.getId());
             m.put("order",order);
+            list.add(m);
         }
         map.put("count",query.list().size());
         map.put("code",0);
         map.put("msg","");
+        map.put("data",list);
         return map;
     }
 
@@ -522,10 +555,12 @@ public class OrderServiceImpl implements OrderService {
             //通过任务编号查询业务数据
             Map<String, Object> order = findTaskAndOrderByTaskId(task.getId());
             m.put("order",order);
+            list.add(m);
         }
         map.put("count",query.list().size());
         map.put("code",0);
         map.put("msg","");
+        map.put("data",list);
         return map;
     }
 
@@ -544,10 +579,15 @@ public class OrderServiceImpl implements OrderService {
             //通过任务编号查询业务数据
             Map<String, Object> order = findTaskAndOrderByTaskId(task.getId());
             m.put("order",order);
+            //通过编号查询退款申请数据
+            Map<String, Object> refundApplyInfo = orderMapper.findRefundApplyByOrderId(order.get("order_id").toString());
+            m.put("refundApplyInfo",refundApplyInfo);
+            list.add(m);
         }
         map.put("count",query.list().size());
         map.put("code",0);
         map.put("msg","");
+        map.put("data",list);
         return map;
     }
 }

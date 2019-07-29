@@ -5,6 +5,7 @@
     <title>退款处理列表</title>
     <link rel="stylesheet" type="text/css" th:href="@{/gateway/order/layui/css/layui.css}"/>
     <script type="text/javascript" th:src="@{/gateway/order/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/gateway/order/js/dateFormat.js}"></script>
 </head>
 <body>
 <table id="demo" lay-filter="test"></table>
@@ -21,13 +22,29 @@
             ,cols:
                 [
                     [ //表头
-                        {field: 'task_id', title: '任务编号'},
-                        {field: 'task_name', title: '任务名称'}
+                        {field: 'task_id', title: '任务编号',align:'center'},
+                        {field: 'task_name', title: '任务名称',align:'center'},
+                        {field: 'task_name', title: '退款申请时间',align:'center',
+                            templet:function(obj){
+                                return format(obj.refundApplyInfo.refund_time);
+                            }
+                        },
+                        {field: 'task_name',title: '操作',align:'center',
+                            templet:function(obj){
+                                return '<button class="layui-btn layui-btn-sm" lay-event="execute_task">处理任务</button>';
+                            }
+                        }
                     ]
                 ],
             request:{
                 pageName:'pageIndex',
                 limitName:'pageSize'
+            }
+        });
+
+        table.on("tool(test)",function(obj){
+            if(obj.event='execute_task'){
+                location.href="http://localhost:9000/gateway/order/forwardRefundOrderAudit/"+obj.data.task_id;
             }
         });
 
